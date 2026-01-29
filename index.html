@@ -1,180 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>LyricWave 🎵</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #ffffff;
-      color: #111;
-      display: flex;
-      justify-content: center;
-      padding: 30px 15px;
-    }
-
-    .container {
-      max-width: 700px;
-      width: 100%;
-    }
-
-    h1 {
-      text-align: center;
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 25px;
-    }
-
-    .inputs {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
-    input {
-      flex: 1;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #ddd;
-      font-size: 16px;
-    }
-
-    button {
-      padding: 14px 20px;
-      border-radius: 12px;
-      border: none;
-      background: #1db954;
-      color: white;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #1ed760;
-    }
-
-    .card {
-      background: #f9f9f9;
-      border-radius: 18px;
-      padding: 25px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
-
-    .cover {
-      display: none;
-      width: 180px;
-      border-radius: 12px;
-      margin: 0 auto 20px;
-    }
-
-    .song-info {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .song-info h2 {
-      margin: 0;
-      font-size: 20px;
-    }
-
-    .song-info p {
-      margin: 4px 0 0;
-      color: #555;
-    }
-
-    .lyrics {
-      white-space: pre-wrap;
-      font-size: 18px;
-      line-height: 1.8;
-      color: #222;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 12px;
-      color: #888;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>LyricWave Music</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body {margin:0;font-family:'Inter',sans-serif;background:#fff;color:#111;display:flex;flex-direction:column;min-height:100vh;}
+  header {background:#fff;border-bottom:1px solid #eee;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;}
+  header h1 {margin:0;font-size:22px;color:#1db954;}
+  nav button {background:none;border:none;font-size:16px;margin-left:15px;cursor:pointer;color:#111;}
+  nav button.active {font-weight:600;color:#1db954;}
+  .container {flex:1;padding:20px;max-width:1000px;margin:0 auto;}
+  .search-bar {display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .search-bar input {flex:1;padding:12px;border-radius:10px;border:1px solid #ddd;font-size:16px;}
+  .search-bar button {padding:12px 20px;border-radius:10px;border:none;background:#1db954;color:white;cursor:pointer;font-weight:600;}
+  .song-list {display:flex;flex-wrap:wrap;gap:15px;transition:all 0.3s;}
+  .song-card {background:#f9f9f9;border-radius:15px;padding:15px;flex:1 1 200px;max-width:220px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:transform 0.2s, box-shadow 0.3s;}
+  .song-card:hover {transform:scale(1.05);box-shadow:0 4px 15px rgba(0,0,0,0.15);}
+  .song-card img {width:150px;height:150px;border-radius:12px;margin-bottom:10px;}
+  .song-card h3 {margin:0;font-size:16px;text-align:center;}
+  .song-card p {margin:2px 0 0;font-size:14px;color:#555;text-align:center;}
+  #lyrics {margin-top:15px;white-space:pre-wrap;font-size:16px;line-height:1.6;color:#222;}
+  #player {position:sticky;bottom:0;left:0;width:100%;background:#f9f9f9;border-top:1px solid #eee;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:100;}
+  #player button {background:#1db954;border:none;padding:8px 12px;border-radius:8px;color:white;font-weight:600;cursor:pointer;margin-left:5px;}
+  audio {display:none;}
+  .artist-popup {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;visibility:hidden;opacity:0;transition:opacity 0.3s;}
+  .artist-popup.active {visibility:visible;opacity:1;}
+  .artist-content {background:#fff;padding:20px;border-radius:15px;max-width:800px;width:90%;max-height:80%;overflow:auto;}
+  .artist-header {display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;}
+  .artist-header h2 {margin:0;color:#1db954;}
+  .close-btn {cursor:pointer;font-weight:700;font-size:18px;}
+  @media(max-width:600px){.song-card img{width:120px;height:120px;}.song-card{flex:1 1 45%;}}
+</style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>LyricWave</h1>
-    <div class="subtitle">Clean lyrics. No distractions.</div>
+<header>
+  <h1>LyricWave</h1>
+  <nav>
+    <button class="active" onclick="showPage('home')">Home</button>
+    <button onclick="showPage('search')">Search</button>
+    <button onclick="showPage('playlist')">Playlist</button>
+  </nav>
+</header>
 
-    <div class="inputs">
-      <input id="artist" placeholder="Artist">
-      <input id="song" placeholder="Song title">
-      <button onclick="search()">Search</button>
-    </div>
-
-    <div class="card">
-      <img id="cover" class="cover">
-      <div class="song-info">
-        <h2 id="title"></h2>
-        <p id="artistName"></p>
-      </div>
-      <div class="lyrics" id="lyrics">Search for a song to see lyrics 🎶</div>
-    </div>
-
-    <div class="footer">made with taste 💚</div>
+<div class="container">
+  <!-- Home Page -->
+  <div id="home" class="page">
+    <h2>Trending Songs</h2>
+    <div id="trending" class="song-list"></div>
+    <h2>Featured Artists</h2>
+    <div id="featuredArtists" class="song-list"></div>
   </div>
 
-  <script>
-    async function search() {
-      const artist = document.getElementById("artist").value.trim();
-      const song = document.getElementById("song").value.trim();
-      const lyricsBox = document.getElementById("lyrics");
-      const cover = document.getElementById("cover");
+  <!-- Search Page -->
+  <div id="search" class="page" style="display:none;">
+    <div class="search-bar">
+      <input type="text" id="artistInput" placeholder="Artist">
+      <input type="text" id="songInput" placeholder="Song Title">
+      <button onclick="searchSong()">Search</button>
+    </div>
+    <div id="searchResults" class="song-list"></div>
+    <div id="lyrics"></div>
+  </div>
 
-      if (!artist || !song) {
-        lyricsBox.textContent = "Please enter artist and song.";
-        return;
-      }
+  <!-- Playlist Page -->
+  <div id="playlist" class="page" style="display:none;">
+    <h2>Liked Songs</h2>
+    <div id="likedSongs" class="song-list"></div>
+  </div>
+</div>
 
-      lyricsBox.textContent = "Fetching lyrics…";
-      cover.style.display = "none";
+<!-- Artist Popup -->
+<div id="artistPopup" class="artist-popup">
+  <div class="artist-content">
+    <div class="artist-header">
+      <h2 id="artistName"></h2>
+      <span class="close-btn" onclick="closeArtist()">×</span>
+    </div>
+    <div id="artistSongs" class="song-list"></div>
+  </div>
+</div>
 
-      // Lyrics
-      try {
-        const lyricsRes = await fetch(`https://api.lyrics.ovh/v1/${artist}/${song}`);
-        const lyricsData = await lyricsRes.json();
-        lyricsBox.textContent = lyricsData.lyrics || "Lyrics not found.";
-      } catch {
-        lyricsBox.textContent = "Could not load lyrics.";
-      }
+<!-- Audio Player -->
+<div id="player">
+  <div id="currentSong">Nothing Playing</div>
+  <div>
+    <button onclick="playPrev()">Prev</button>
+    <button onclick="playPause()">Play/Pause</button>
+    <button onclick="playNext()">Next</button>
+    <button onclick="shufflePlaylist()">Shuffle</button>
+  </div>
+  <audio id="audio"></audio>
+</div>
 
-      // Cover art (iTunes)
-      try {
-        const coverRes = await fetch(
-          `https://itunes.apple.com/search?term=${artist} ${song}&entity=song&limit=1`
-        );
-        const coverData = await coverRes.json();
+<script>
+let pages=['home','search','playlist'];
+function showPage(page){
+  pages.forEach(p=>document.getElementById(p).style.display='none');
+  document.getElementById(page).style.display='block';
+  document.querySelectorAll('nav button').forEach(btn=>btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
 
-        if (coverData.results.length > 0) {
-          cover.src = coverData.results[0].artworkUrl100.replace("100x100", "300x300");
-          cover.style.display = "block";
-          document.getElementById("title").textContent = coverData.results[0].trackName;
-          document.getElementById("artistName").textContent = coverData.results[0].artistName;
-        }
-      } catch {}
+// Player
+let audio=document.getElementById('audio');
+let currentIndex=0;
+let playlist=[];
+
+function playSong(song){
+  audio.src=song.previewUrl;
+  audio.play();
+  document.getElementById('currentSong').textContent=song.trackName + " - " + song.artistName;
+  addToLiked(song);
+}
+
+function playPause(){audio.paused?audio.play():audio.pause();}
+function playNext(){currentIndex=(currentIndex+1)%playlist.length;playSong(playlist[currentIndex]);}
+function playPrev(){currentIndex=(currentIndex-1+playlist.length)%playlist.length;playSong(playlist[currentIndex]);}
+function shufflePlaylist(){playlist=playlist.sort(()=>Math.random()-0.5);currentIndex=0;playSong(playlist[0]);}
+
+function addToLiked(song){
+  let liked=JSON.parse(localStorage.getItem('likedSongs')||'[]');
+  if(!liked.some(s=>s.trackId===song.trackId)) liked.push(song);
+  localStorage.setItem('likedSongs',JSON.stringify(liked));
+  renderLiked();
+}
+
+function renderLiked(){
+  let liked=JSON.parse(localStorage.getItem('likedSongs')||'[]');
+  let container=document.getElementById('likedSongs');
+  container.innerHTML='';
+  liked.forEach(song=>{
+    let card=document.createElement('div'); card.className='song-card';
+    card.innerHTML=`<img src="${song.artworkUrl100.replace('100x100','300x300')}"><h3>${song.trackName}</h3><p>${song.artistName}</p>`;
+    card.onclick=()=>playSong(song);
+    container.appendChild(card);
+  });
+}
+
+// Trending + Featured Artists (Home)
+async function fetchHome(){
+  // Trending
+  const res1=await fetch('https://itunes.apple.com/us/rss/topsongs/limit=10/json');
+  const data1=await res1.json();
+  const songs=data1.feed.entry.map(e=>({
+    trackName:e['im:name'].label,
+    artistName:e['im:artist'].label,
+    previewUrl:e.link[1].attributes.href,
+    artworkUrl100:e['im:image'][2].label,
+    trackId:e.id.attributes['im:id']
+  }));
+  playlist=songs;
+  let container=document.getElementById('trending'); container.innerHTML='';
+  songs.forEach(song=>{
+    let card=document.createElement('div'); card.className='song-card';
+    card.innerHTML=`<img src="${song.artworkUrl100}"><h3>${song.trackName}</h3><p>${song.artistName}</p>`;
+    card.onclick=()=>{currentIndex=playlist.indexOf(song); playSong(song);};
+    container.appendChild(card);
+  });
+
+  // Featured Artists
+  const featured=['Taylor Swift','Drake','Billie Eilish','Ed Sheeran','Adele'];
+  let fContainer=document.getElementById('featuredArtists'); fContainer.innerHTML='';
+  featured.forEach(async artist=>{
+    let res=await fetch(`https://itunes.apple.com/search?term=${artist}&entity=song&limit=1`);
+    let data=await res.json();
+    let song=data.results[0];
+    if(song){
+      let card=document.createElement('div'); card.className='song-card';
+      card.innerHTML=`<img src="${song.artworkUrl100.replace('100x100','300x300')}"><h3>${song.artistName}</h3>`;
+      card.onclick=()=>openArtist(artist);
+      fContainer.appendChild(card);
     }
+  });
+}
 
-    document.addEventListener("keypress", e => {
-      if (e.key === "Enter") search();
-    });
-  </script>
+// Search
+async function searchSong(){
+  let artist=document.getElementById('artistInput').value.trim();
+  let songTitle=document.getElementById('songInput').value.trim();
+  if(!artist&&!songTitle) return;
+  const res=await fetch(`https://itunes.apple.com/search?term=${artist} ${songTitle}&entity=song&limit=10`);
+  const data=await res.json();
+  let songs=data.results;
+  let container=document.getElementById('searchResults'); container.innerHTML='';
+  songs.forEach(song=>{
+    let card=document.createElement('div'); card.className='song-card';
+    card.innerHTML=`<img src="${song.artworkUrl100.replace('100x100','300x300')}"><h3>${song.trackName}</h3><p>${song.artistName}</p>`;
+    card.onclick=()=>{currentIndex=playlist.indexOf(song); playSong(song); fetchLyrics(song.artistName,song.trackName);};
+    container.appendChild(card);
+  });
+  playlist=songs;
+}
+
+// Lyrics
+async function fetchLyrics(artist,song){
+  let lyricsBox=document.getElementById('lyrics');
+  lyricsBox.textContent='Fetching lyrics…';
+  try{
+    const res=await fetch(`https://api.lyrics.ovh/v1/${artist}/${song}`);
+    const data=await res.json();
+    lyricsBox.textContent=data.lyrics||'Lyrics not found.';
+  } catch{lyricsBox.textContent='Could not load lyrics.';}
+}
+
+// Artist Popup
+async function openArtist(artist){
+  document.getElementById('artistPopup').classList.add('active');
+  document.getElementById('artistName').textContent=artist;
+  const res=await fetch(`https://itunes.apple.com/search?term=${artist}&entity=song&limit=20`);
+  const data=await res.json();
+  let container=document.getElementById('artistSongs'); container.innerHTML='';
+  data.results.forEach(song=>{
+    let card=document.createElement('div'); card.className='song-card';
+    card.innerHTML=`<img src="${song.artworkUrl100.replace('100x100','300x300')}"><h3>${song.trackName}</h3><p>${song.collectionName}</p>`;
+    card.onclick=()=>playSong(song);
+    container.appendChild(card);
+  });
+}
+
+function closeArtist(){
+  document.getElementById('artistPopup').classList.remove('active');
+}
+
+// Init
+fetchHome();
+renderLiked();
+</script>
 
 </body>
-</html>
+  </html>
