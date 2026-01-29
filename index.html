@@ -2,169 +2,178 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>LyricWave 🎧</title>
-
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>LyricWave 🎵</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      min-height: 100vh;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
-      color: #f5f5f5;
+      font-family: 'Inter', sans-serif;
+      background: #ffffff;
+      color: #111;
       display: flex;
       justify-content: center;
-      align-items: center;
-      padding: 20px;
+      padding: 30px 15px;
     }
 
     .container {
+      max-width: 700px;
       width: 100%;
-      max-width: 720px;
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(15px);
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      animation: fadeIn 1s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     h1 {
       text-align: center;
       font-weight: 600;
       margin-bottom: 5px;
-      letter-spacing: 1px;
     }
 
     .subtitle {
       text-align: center;
-      font-size: 0.9rem;
-      color: #aaa;
-      margin-bottom: 30px;
+      color: #666;
+      margin-bottom: 25px;
     }
 
     .inputs {
       display: flex;
-      flex-direction: column;
-      gap: 12px;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
 
     input {
+      flex: 1;
       padding: 14px;
       border-radius: 12px;
-      border: none;
-      outline: none;
-      font-size: 1rem;
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-    }
-
-    input::placeholder {
-      color: #bbb;
+      border: 1px solid #ddd;
+      font-size: 16px;
     }
 
     button {
-      margin-top: 10px;
-      padding: 14px;
-      border-radius: 14px;
+      padding: 14px 20px;
+      border-radius: 12px;
       border: none;
-      background: linear-gradient(135deg, #1db954, #1ed760);
-      color: #000;
-      font-size: 1rem;
+      background: #1db954;
+      color: white;
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
     }
 
     button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(30,215,96,0.4);
+      background: #1ed760;
     }
 
-    .lyrics-box {
-      margin-top: 30px;
-      max-height: 320px;
-      overflow-y: auto;
-      padding: 20px;
-      border-radius: 14px;
-      background: rgba(0,0,0,0.35);
+    .card {
+      background: #f9f9f9;
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .cover {
+      display: none;
+      width: 180px;
+      border-radius: 12px;
+      margin: 0 auto 20px;
+    }
+
+    .song-info {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .song-info h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .song-info p {
+      margin: 4px 0 0;
+      color: #555;
+    }
+
+    .lyrics {
       white-space: pre-wrap;
-      line-height: 1.7;
-      font-size: 0.95rem;
+      font-size: 18px;
+      line-height: 1.8;
+      color: #222;
     }
 
     .footer {
       text-align: center;
       margin-top: 20px;
-      font-size: 0.75rem;
-      color: #777;
-    }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 22px;
-      }
+      font-size: 12px;
+      color: #888;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>LyricWave 🎶</h1>
-    <div class="subtitle">Find the words that hit different</div>
+    <h1>LyricWave</h1>
+    <div class="subtitle">Clean lyrics. No distractions.</div>
 
     <div class="inputs">
-      <input type="text" id="artist" placeholder="Artist (e.g. Billie Eilish)">
-      <input type="text" id="song" placeholder="Song title">
-      <button onclick="getLyrics()">Get Lyrics</button>
+      <input id="artist" placeholder="Artist">
+      <input id="song" placeholder="Song title">
+      <button onclick="search()">Search</button>
     </div>
 
-    <div class="lyrics-box" id="lyrics">
-      Your lyrics will appear here ✨
+    <div class="card">
+      <img id="cover" class="cover">
+      <div class="song-info">
+        <h2 id="title"></h2>
+        <p id="artistName"></p>
+      </div>
+      <div class="lyrics" id="lyrics">Search for a song to see lyrics 🎶</div>
     </div>
 
-    <div class="footer">
-      made with feelings 🖤
-    </div>
+    <div class="footer">made with taste 💚</div>
   </div>
 
   <script>
-    async function getLyrics() {
+    async function search() {
       const artist = document.getElementById("artist").value.trim();
       const song = document.getElementById("song").value.trim();
       const lyricsBox = document.getElementById("lyrics");
+      const cover = document.getElementById("cover");
 
       if (!artist || !song) {
-        lyricsBox.textContent = "Please enter both artist and song 😌";
+        lyricsBox.textContent = "Please enter artist and song.";
         return;
       }
 
-      lyricsBox.textContent = "Loading lyrics... 🎧";
+      lyricsBox.textContent = "Fetching lyrics…";
+      cover.style.display = "none";
 
+      // Lyrics
       try {
-        const res = await fetch(`https://api.lyrics.ovh/v1/${artist}/${song}`);
-        const data = await res.json();
-
-        if (data.lyrics) {
-          lyricsBox.textContent = data.lyrics;
-        } else {
-          lyricsBox.textContent = "Lyrics not found 💔";
-        }
+        const lyricsRes = await fetch(`https://api.lyrics.ovh/v1/${artist}/${song}`);
+        const lyricsData = await lyricsRes.json();
+        lyricsBox.textContent = lyricsData.lyrics || "Lyrics not found.";
       } catch {
-        lyricsBox.textContent = "Something went wrong 😭";
+        lyricsBox.textContent = "Could not load lyrics.";
       }
+
+      // Cover art (iTunes)
+      try {
+        const coverRes = await fetch(
+          `https://itunes.apple.com/search?term=${artist} ${song}&entity=song&limit=1`
+        );
+        const coverData = await coverRes.json();
+
+        if (coverData.results.length > 0) {
+          cover.src = coverData.results[0].artworkUrl100.replace("100x100", "300x300");
+          cover.style.display = "block";
+          document.getElementById("title").textContent = coverData.results[0].trackName;
+          document.getElementById("artistName").textContent = coverData.results[0].artistName;
+        }
+      } catch {}
     }
+
+    document.addEventListener("keypress", e => {
+      if (e.key === "Enter") search();
+    });
   </script>
 
 </body>
